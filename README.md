@@ -19,27 +19,26 @@ git clone https://github.com/mkorpela/rflogs-server.git
 cd rflogs-server
 ```
 
-2. Create and activate a virtual environment:
+2. Install poetry if you haven't already:
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install poetry
 ```
 
-3. Install development dependencies:
+3. Install dependencies:
 ```bash
-pip install -e ".[dev]"
+poetry install
 ```
 
 4. Run the server:
 ```bash
-python -m rflogs.main
+poetry run uvicorn rflogs_server.main:app --reload
 ```
 
 ## Development
 
 ### Running Tests
 ```bash
-pytest
+poetry run pytest
 ```
 
 ### Code Style
@@ -51,15 +50,38 @@ The project uses:
 
 To run all checks:
 ```bash
-black .
-isort .
-mypy src
-ruff check .
+poetry run black .
+poetry run isort .
+poetry run mypy rflogs_server
+poetry run ruff check .
 ```
+
+### Docker Development
+
+Build and run using Docker:
+```bash
+docker build -t rflogs-server .
+docker run -p 8000:8000 rflogs-server
+```
+
+## Environment Variables
+
+- `STORAGE_BACKEND`: Storage backend to use ('s3' or 'local')
+- `AWS_ACCESS_KEY_ID`: AWS access key (when using S3 backend)
+- `AWS_SECRET_ACCESS_KEY`: AWS secret key (when using S3 backend)
+- `AWS_DEFAULT_REGION`: AWS region (when using S3 backend)
+- `DATABASE_URL`: PostgreSQL database URL
+- `OIDC_ISSUER`: OpenID Connect issuer URL
+- `OIDC_CLIENT_ID`: OpenID Connect client ID
+- `OIDC_CLIENT_SECRET`: OpenID Connect client secret
 
 ## Documentation
 
-See the [docs](docs/) directory for detailed documentation.
+See the [docs](docs/) directory for detailed documentation:
+- [API Reference](docs/api.md)
+- [Storage Backends](docs/storage.md)
+- [Authentication](docs/auth.md)
+- [Database Schema](docs/database.md)
 
 ## Contributing
 
