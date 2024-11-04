@@ -21,7 +21,6 @@ from .oidc_utils import (
 from .routes.projects_management import project_router
 from .routes.public_routes import public_router
 from .routes.runs_routes import init_runs
-from .routes.subscriptions_routes import subscription_router
 from .routes.user_management import get_current_user, init_user_management
 from .routes.workspace_routes import workspace_router
 
@@ -71,7 +70,6 @@ app.openapi = custom_openapi
 
 init_user_management(app)
 init_runs(app)
-app.include_router(subscription_router, prefix="/api")
 app.include_router(project_router, prefix="/api")
 app.include_router(workspace_router, prefix="/api")
 app.include_router(public_router, prefix="/api")
