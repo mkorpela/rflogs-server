@@ -1,16 +1,16 @@
-from collections import defaultdict
 import datetime
 import gzip
-from io import BytesIO
 import os
 import statistics
+import xml.etree.ElementTree as ET
+from collections import defaultdict
+from io import BytesIO
 from typing import Dict, List, Optional
 
 from .database.runs import update_run_info
-from .storage import StorageManager
-import xml.etree.ElementTree as ET
-from .models import ParsedRunStats, Workspace, TimingStats
 from .logging_config import get_logger
+from .models import ParsedRunStats, TimingStats, Workspace
+from .storage import StorageManager
 
 logger = get_logger(__name__)
 

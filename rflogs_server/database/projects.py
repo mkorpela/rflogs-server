@@ -1,14 +1,16 @@
-from datetime import datetime, timedelta
 import secrets
+from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 import argon2
 import psycopg2
+
+from rflogs_server.logging_config import get_logger
 from rflogs_server.models import Project, ProjectInvitation, User, Workspace
 from rflogs_server.utils import generate_urlsafe_id
-from .users import get_workspace_by_id, get_workspace_by_owner_id
+
 from .connection import get_db_connection
-from rflogs_server.logging_config import get_logger
+from .users import get_workspace_by_id, get_workspace_by_owner_id
 
 argon2_hasher = argon2.PasswordHasher()
 

@@ -1,22 +1,23 @@
 # server/rflogs_server/routes/public_routes.py
 
-from urllib.parse import urlencode
-from fastapi import APIRouter, HTTPException, Path, Query, Request
+import mimetypes
+import os
 from typing import Dict, List, Optional
+from urllib.parse import urlencode
 
-from ..database.users import get_workspace_by_id
+from fastapi import APIRouter, HTTPException, Path, Query, Request
+from fastapi.responses import StreamingResponse
+
 from ..database.projects import get_project_by_id
 from ..database.runs import (
+    get_file_info,
     get_project_tags,
     get_run_info,
     list_project_runs,
-    get_file_info,
 )
+from ..database.users import get_workspace_by_id
 from ..models import ProjectRunsResponse, RunInfo
 from ..storage import StorageManager
-from fastapi.responses import StreamingResponse
-import os
-import mimetypes
 
 public_router = APIRouter()
 

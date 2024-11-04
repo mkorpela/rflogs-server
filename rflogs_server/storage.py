@@ -1,12 +1,12 @@
 import io
 import os
 from typing import Tuple
+
 from botocore.exceptions import ClientError
 
-from .utils import get_s3_client
-
-from .models import Workspace
 from .logging_config import get_logger
+from .models import Workspace
+from .utils import get_s3_client
 
 logger = get_logger(__name__)
 

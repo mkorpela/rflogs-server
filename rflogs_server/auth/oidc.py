@@ -1,16 +1,20 @@
-import httpx
-import jwt
 import secrets
 from typing import Dict, Optional
+
+import httpx
+import jwt
 from fastapi import HTTPException
+
 from ..logging_config import get_logger
 from ..models import Workspace
 from .providers import AuthProvider
 
 logger = get_logger(__name__)
 
+
 class OIDCConfig:
     """OIDC provider configuration."""
+
     def __init__(self, workspace: Workspace):
         if not workspace.oidc_enabled:
             raise ValueError("OIDC is not enabled for this workspace")
@@ -20,17 +24,18 @@ class OIDCConfig:
             raise ValueError("OIDC client ID is not set")
         if not workspace.oidc_client_secret:
             raise ValueError("OIDC client secret is not set")
-            
+
         self.provider_url = workspace.oidc_provider_url
         self.client_id = workspace.oidc_client_id
         self.client_secret = workspace.oidc_client_secret
         self.issuer_url = workspace.oidc_issuer_url
 
+
 class OIDCProvider(AuthProvider):
     def __init__(self, config: OIDCConfig):
         self.config = config
         self._well_known_config: Optional[Dict] = None
-        
+
     async def _get_well_known_config(self) -> Dict:
         """Fetch and cache OIDC provider configuration."""
         if self._well_known_config is None:
@@ -40,8 +45,7 @@ class OIDCProvider(AuthProvider):
                 )
                 if response.status_code != 200:
                     raise HTTPException(
-                        status_code=500,
-                        detail="Failed to fetch OIDC configuration"
+                        status_code=500, detail="Failed to fetch OIDC configuration"
                     )
                 self._well_known_config = response.json()
         return self._well_known_config
@@ -50,7 +54,7 @@ class OIDCProvider(AuthProvider):
         """Fetch JSON Web Key Set from provider."""
         config = await self._get_well_known_config()
         jwks_uri = config["jwks_uri"]
-        
+
         async with httpx.AsyncClient() as client:
             response = await client.get(jwks_uri)
             if response.status_code != 200:
@@ -61,9 +65,11 @@ class OIDCProvider(AuthProvider):
         """Authenticate a user's JWT token."""
         try:
             jwks = await self._get_jwks()
-            jwks_client = jwt.PyJWKClient(self.config.provider_url + "/.well-known/jwks.json")
+            jwks_client = jwt.PyJWKClient(
+                self.config.provider_url + "/.well-known/jwks.json"
+            )
             signing_key = jwks_client.get_signing_key_from_jwt(token)
-            
+
             payload = jwt.decode(
                 token,
                 signing_key.key,
@@ -71,7 +77,7 @@ class OIDCProvider(AuthProvider):
                 audience=self.config.client_id,
                 issuer=self.config.issuer_url,
             )
-            
+
             return {
                 "sub": payload["sub"],
                 "email": payload.get("email"),
@@ -85,16 +91,16 @@ class OIDCProvider(AuthProvider):
         """Get the OIDC login URL with appropriate parameters."""
         config = await self._get_well_known_config()
         auth_endpoint = config["authorization_endpoint"]
-        
+
         params = {
             "response_type": "code",
             "client_id": self.config.client_id,
             "redirect_uri": redirect_uri,
             "scope": "openid email profile",
             "state": state,
-            "nonce": secrets.token_urlsafe(16)
+            "nonce": secrets.token_urlsafe(16),
         }
-        
+
         query = "&".join(f"{k}={v}" for k, v in params.items())
         return f"{auth_endpoint}?{query}"
 
@@ -104,7 +110,7 @@ class OIDCProvider(AuthProvider):
         """Handle OIDC callback and token exchange."""
         config = await self._get_well_known_config()
         token_endpoint = config["token_endpoint"]
-        
+
         async with httpx.AsyncClient() as client:
             # Exchange code for tokens
             token_response = await client.post(
@@ -123,24 +129,21 @@ class OIDCProvider(AuthProvider):
                 logger.error(
                     "Token exchange failed",
                     status=token_response.status_code,
-                    content=token_response.text
+                    content=token_response.text,
                 )
                 raise HTTPException(
-                    status_code=400,
-                    detail="Failed to exchange code for token"
+                    status_code=400, detail="Failed to exchange code for token"
                 )
 
             tokens = token_response.json()
-            
+
             # Verify ID token
             user_info = await self.authenticate(tokens["id_token"])
             if not user_info:
-                raise HTTPException(
-                    status_code=401,
-                    detail="Invalid ID token"
-                )
-                
+                raise HTTPException(status_code=401, detail="Invalid ID token")
+
             return user_info
+
 
 def create_auth_provider(workspace: Workspace) -> AuthProvider:
     """Factory function to create appropriate auth provider."""

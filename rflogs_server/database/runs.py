@@ -1,7 +1,9 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Set, Tuple
+
 import psycopg2
+
 from rflogs_server.logging_config import get_logger
 from rflogs_server.models import (
     FileInfo,
@@ -13,6 +15,7 @@ from rflogs_server.models import (
     User,
 )
 from rflogs_server.utils import TAG_KEY_PATTERN, TAG_VALUE_PATTERN, generate_urlsafe_id
+
 from .connection import get_db_connection
 
 logger = get_logger(__name__)

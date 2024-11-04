@@ -1,6 +1,8 @@
 import os
+
 import psycopg2
 from psycopg2.extras import DictCursor
+
 from rflogs_server.logging_config import get_logger
 
 logger = get_logger(__name__)

@@ -1,39 +1,29 @@
+import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-import os
 from typing import Optional
 from urllib.parse import unquote, urlencode
 
-from fastapi import (
-    Depends,
-    FastAPI,
-    HTTPException,
-    Request,
-)
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import RedirectResponse
 
 from .database.connection import run_migrations
-
 from .database.users import get_workspace_by_id
-
+from .logging_config import get_logger
 from .models import User
-
 from .oidc_utils import (
     create_oidc_login_url,
     exchange_code_for_token,
     verify_oidc_token,
 )
-
-from .routes.user_management import get_current_user, init_user_management
-from .routes.subscriptions_routes import subscription_router
 from .routes.projects_management import project_router
-from .routes.workspace_routes import workspace_router
 from .routes.public_routes import public_router
 from .routes.runs_routes import init_runs
-
-from .logging_config import get_logger
-from fastapi.openapi.utils import get_openapi
+from .routes.subscriptions_routes import subscription_router
+from .routes.user_management import get_current_user, init_user_management
+from .routes.workspace_routes import workspace_router
 
 logger = get_logger(__name__)
 

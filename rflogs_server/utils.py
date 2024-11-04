@@ -1,10 +1,11 @@
-import uuid
 import base64
+import os
 import re
+import uuid
+
 import boto3
 import boto3.exceptions
 from botocore.client import Config
-import os
 
 
 def map_base64_char_to_alphabet(char: str) -> str:

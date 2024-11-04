@@ -1,6 +1,9 @@
-from datetime import datetime
 import mimetypes
+import os
+from datetime import datetime
 from typing import Dict, List, Optional
+from urllib.parse import quote, urlencode
+
 from fastapi import (
     APIRouter,
     BackgroundTasks,
@@ -17,9 +20,13 @@ from fastapi import (
 )
 from fastapi.responses import RedirectResponse, StreamingResponse
 from pydantic import BaseModel
-import os
-from urllib.parse import quote, urlencode
 
+from rflogs_server.database.projects import (
+    add_user_to_project,
+    get_project_by_id,
+    get_project_storage_usage,
+    user_has_project_access,
+)
 from rflogs_server.database.runs import (
     add_file_to_run,
     create_run_info,
@@ -31,20 +38,13 @@ from rflogs_server.database.runs import (
     get_runs_and_files_to_purge,
     list_project_runs,
 )
-from rflogs_server.database.projects import (
-    add_user_to_project,
-    get_project_by_id,
-    get_project_storage_usage,
-    user_has_project_access,
-)
 from rflogs_server.database.users import get_workspace_by_id
 from rflogs_server.output_service import parse_output_xml_background
 
-from .user_management import get_current_user
-from ..models import Project, ProjectRunsResponse, RunCreate, RunInfo, User, Workspace
-
-from ..storage import StorageManager
 from ..logging_config import get_logger
+from ..models import Project, ProjectRunsResponse, RunCreate, RunInfo, User, Workspace
+from ..storage import StorageManager
+from .user_management import get_current_user
 
 logger = get_logger(__name__)
 

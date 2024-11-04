@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from ..models import User, WorkspacePublic, WorkspaceUpdate
+
 from ..database.users import get_workspace_by_owner_id, update_workspace
-from .user_management import get_current_user
 from ..logging_config import get_logger
+from ..models import User, WorkspacePublic, WorkspaceUpdate
+from .user_management import get_current_user
 
 logger = get_logger(__name__)
 

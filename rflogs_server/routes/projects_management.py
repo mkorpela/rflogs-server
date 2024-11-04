@@ -1,13 +1,8 @@
-from datetime import datetime
 import os
-from fastapi import APIRouter, Body, Depends, HTTPException
+from datetime import datetime
 from typing import Optional
 
-from rflogs_server.database.users import (
-    get_user_by_username,
-    get_workspace_by_id,
-    get_workspace_by_owner_id,
-)
+from fastapi import APIRouter, Body, Depends, HTTPException
 
 from rflogs_server.database.projects import (
     add_user_to_project,
@@ -15,19 +10,24 @@ from rflogs_server.database.projects import (
     create_project,
     create_project_invitation,
     delete_project,
+    get_active_projects_count,
     get_project_by_id,
     list_user_projects,
     recreate_api_key,
     remove_user_project_access,
     update_project_in_db,
     user_has_project_access,
-    get_active_projects_count,
+)
+from rflogs_server.database.users import (
+    get_user_by_username,
+    get_workspace_by_id,
+    get_workspace_by_owner_id,
 )
 
-from .user_management import get_current_session_user
+from ..logging_config import get_logger
 from ..models import MAX_RETENTION_DAYS, Project, User
 from ..storage import StorageManager
-from ..logging_config import get_logger
+from .user_management import get_current_session_user
 
 logger = get_logger(__name__)
 
